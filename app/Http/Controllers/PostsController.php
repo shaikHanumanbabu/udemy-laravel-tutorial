@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostsController extends Controller
 {
     
+    public function __construct() {
+        $this->middleware('auth')
+             ->only(['create', 'store', 'edit', 'update', 'destroy']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +21,16 @@ class PostsController extends Controller
      */
     public function index()
     {
-        return view('posts.index', ['posts' => BlogPost::all()]);
+        // DB::enableQueryLog();
+        // $posts = BlogPost::with('comments')->get();
+        // foreach($posts as $post) {
+        //     foreach($post->comments as $comment) {
+        //         echo $comment;
+        //     }
+        // }
+
+        // dd(DB::getQueryLog());
+        return view('posts.index', ['posts' => BlogPost::withCount('comments')->get()]);
     }
 
     /**
@@ -51,7 +65,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        return view('posts.show', ['post' => BlogPost::findOrFail($id)]);
+        return view('posts.show', ['post' => BlogPost::with('comments')->findOrFail($id)]);
     }
 
     /**

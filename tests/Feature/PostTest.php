@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\BlogPost;
+use App\Models\Comment;
+use Database\Factories\CommentFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -21,20 +23,20 @@ class PostTest extends TestCase
         $response->assertSeeText('No Posts Found');
     }
 
-    public function testsee1BlogPostWhenThereIs1()
+    public function createDemoPost()
     {
+        $this->setUpFaker();
         $post = new BlogPost();
-        $post->title = 'Sample test';
-        $post->content = 'Sample content';
+        $post->title = $this->faker->text($maxNbChars = 50);
+        $post->content = $this->faker->text;
         $post->save();
 
-        $response = $this->get('/posts');
-
-        $response->assertSeeText($post->title);
+        return $post;
     }
 
     public function testStoreValid()
     {
+        $this->actingAs($this->getTestUser());
         $this->setUpFaker();
         $params = [
             'title' => $this->faker->text($maxNbChars = 50),
@@ -94,6 +96,18 @@ class PostTest extends TestCase
         $this->assertEquals(session('status'), 'BlogPost was deleted!');
 
         $this->assertDatabaseMissing('blog_posts', ['id' => $post->id]);
+    }
+
+    public function testBlogPostWithCommentWithHelpOfFactory()
+    {
+        
+        $post = $this->createDemoPost();
+        Comment::factory()->create(['blog_post_id' => $post->id]);
+        
+        $this->assertDatabaseHas('comments', [
+            'blog_post_id' => $post->id
+        ]);
+        // $this->assertEquals(session('status'), 'BlogPost was created');
     }
 
     

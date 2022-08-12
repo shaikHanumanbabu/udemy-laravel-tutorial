@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostsController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,13 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [HomeController::class , 'home'])->name('home.index');
+Route::get('/', [HomeController::class , 'home'])
+     ->name('home.index');
+    // ->middleware('auth');
 
 Route::get('/contact', [HomeController::class , 'contact'])->name('home.contact');
 
 Route::get('/single', AboutController::class);
 
-
+Auth::routes();
 
 Route::resource('posts', PostsController::class);
      //->only(['index', 'show', 'create', 'store', 'edit', 'update']);

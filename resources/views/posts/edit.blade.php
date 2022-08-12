@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 
-@section('title', 'Posts')
+@section('title', $post->title)
     
 
 @section('content')
