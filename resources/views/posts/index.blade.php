@@ -5,11 +5,17 @@
     
 
 @section('content')
-
+<div class="row">
+    <div class="col-8">
 @forelse ($posts as $post)
 <h3><a href="{{ route('posts.show', ['post' => $post->id]) }}" >{{ $post->title }}</a></h3>
-    <p>Added {{ $post->created_at->diffForHumans() }}</p>
-    <p>Added by {{ $post->user->name }}</p>
+    @if ($post->trashed())
+        <div class="alert alert-danger">Deleted</div>
+    @endif
+
+    @updated(['date' => $post->created_at, 'name' => $post->user->name])
+        
+    @endupdated
     @if ($post->comments_count)
         <p>{{ $post->comments_count }} Comments</p>
     @else
@@ -36,5 +42,35 @@
 @empty
     <h3>No Posts Found</h3>
 @endforelse
+</div>
+
+<div class="col-4">
+    <div class="container">
+        <div class="row">
+              @card(['title' => 'Most Commented' ])
+                @slot('items')
+                    @foreach ($most_commented as $post)
+                        <li class="list-group-item">
+                            <a href="{{ route('posts.show', ['post' => $post->id ]) }}">{{ $post->title }}</a></li>
+                    @endforeach
+                @endslot
+              @endcard
+        </div>
+        <div class="row mt-2">
+              @card(['title' => 'Most Active User' ])
+                @slot('items', collect($mostActive)->pluck('name'))
+              @endcard
+        </div>
+
+        <div class="row mt-2">
+              @card(['title' => 'Most Active Last Month' ])
+                @slot('items', collect($lastMonthActive)->pluck('name'))
+              @endcard
+        </div>
+    </div>
+    
+</div>
+</div>
+
 
 @endsection

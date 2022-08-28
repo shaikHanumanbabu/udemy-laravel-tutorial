@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            <div class="alert alert-danger">{{ $error }}</div>
+        @endforeach
+    @endif
     <form method="POST" action="{{ route('login') }}">
         @csrf
         

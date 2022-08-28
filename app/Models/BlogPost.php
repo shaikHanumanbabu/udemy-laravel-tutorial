@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\LatestScope;
+use App\Scopes\DeletedAdminScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BlogPost extends Model
 {
@@ -13,17 +16,27 @@ class BlogPost extends Model
     protected $fillable = ['title', 'content', 'user_id'];
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->latest();
     }
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    public function scopeLatest(Builder $builder)
+    {
+        return $builder->orderBy(static::CREATED_AT, 'desc');
+    }
+
+    public function scopeMostCommented(Builder $builder)
+    {
+        return $builder->withCount('comments')->orderBy('comments_count', 'desc');
+    }
+
     public static function boot()
     {
+        static::addGlobalScope(new DeletedAdminScope);
         parent::boot();
-
         static::deleting(function(BlogPost $post) {
             $post->comments()->delete();
         });
@@ -31,7 +44,5 @@ class BlogPost extends Model
         static::restoring(function(BlogPost $post) {
             $post->comments()->restore();
         });
-
-
     }
 }

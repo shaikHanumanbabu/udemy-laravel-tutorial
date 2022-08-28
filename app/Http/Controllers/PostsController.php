@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePost;
@@ -31,7 +32,13 @@ class PostsController extends Controller
         // }
 
         // dd(DB::getQueryLog());
-        return view('posts.index', ['posts' => BlogPost::withCount('comments')->orderBy('id', 'desc')->get()]);
+        return view('posts.index', 
+        [
+            'posts' => BlogPost::latest()->withCount('comments')->get(),
+            'most_commented' => BlogPost::mostCommented()->take(5)->get(),
+            'mostActive' => User::withMostBlogPosts()->take(5)->get(),
+            'lastMonthActive' => User::withMostBlogPostsLastMonth()->take(5)->get(),
+        ]);
     }
 
     /**
@@ -67,6 +74,9 @@ class PostsController extends Controller
      */
     public function show($id)
     {
+        // return view('posts.show', ['post' => BlogPost::with(['comments' => function($query) {
+        //     return $query->latest();
+        // }])->findOrFail($id)]);
         return view('posts.show', ['post' => BlogPost::with('comments')->findOrFail($id)]);
     }
 

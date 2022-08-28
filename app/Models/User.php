@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class User extends Authenticatable
 {
@@ -25,7 +27,23 @@ class User extends Authenticatable
 
     public function blogPosts()
     {
-        $this->hasMany(BlogPost::class);
+        return $this->hasMany(BlogPost::class);
+    }
+
+    public function scopeWithMostBlogPosts(Builder $query)
+    {
+        // return $query->withCount('blogPosts')->orderBy('blog_posts_count', 'desc');
+        return $query->withCount('blogPosts')->orderBy('blog_posts_count', 'desc');
+    }
+
+    public function scopeWithMostBlogPostsLastMonth(Builder $query)
+    {
+        // return $query->withCount('blogPosts')->orderBy('blog_posts_count', 'desc');
+        return $query->withCount(['blogPosts' => function (Builder $query) {
+            return $query->whereBetween(static::CREATED_AT, [now()->modify('-1 month')->format('Y-m-d'), now()]);
+        }])
+        ->has('blogPosts' , '>=', 2)
+        ->orderBy('blog_posts_count', 'desc');
     }
 
     /**

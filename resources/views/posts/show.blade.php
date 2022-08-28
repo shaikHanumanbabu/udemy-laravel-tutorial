@@ -5,24 +5,35 @@
     
 
 @section('content')
-<h1>{{ $post->title }}</h1>
+<h1>{{ $post->title }} 
+    @badge(['show' => now()->diffInMinutes($post->created_at) < 65])
+        Brand new post
+    @endbadge
+</h1>
 <p>{{ $post->content }}</p>
 
-<p>Added {{ $post->created_at->diffForHumans() }}</p>
-<p>Added by {{ $post->user->name }}</p>
 
-@if (now()->diffInMinutes($post->created_at) < 65)
-    <div class="alert alert-success">New</div>
-@endif
+@updated(['date' => $post->created_at, 'name' => $post->user->name])
+        
+@endupdated
+@updated(['date' => $post->updated_at])
+    Updated
+@endupdated
 
-<h4>Comments</h4>
 
+
+@badge(['type' => 'warning'])
+    Comments
+@endbadge
+<hr>
 @forelse ($post->comments as $comment)
     <p>
         {{ $comment->content }}
     </p>
     <p class="text-muted">
-     added {{ $comment->created_at->diffForHumans() }}
+     @updated(['date' => $comment->created_at])
+        
+     @endupdated
     </p>
 @empty
     <p>No comments</p>
