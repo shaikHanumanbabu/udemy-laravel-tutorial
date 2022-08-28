@@ -11,6 +11,6 @@ abstract class TestCase extends BaseTestCase
 
     function getTestUser()
     {
-        return User::findOrFail(2);
+        return User::all()->first();
     }
 }

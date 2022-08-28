@@ -9,6 +9,7 @@
 <p>{{ $post->content }}</p>
 
 <p>Added {{ $post->created_at->diffForHumans() }}</p>
+<p>Added by {{ $post->user->name }}</p>
 
 @if (now()->diffInMinutes($post->created_at) < 65)
     <div class="alert alert-success">New</div>

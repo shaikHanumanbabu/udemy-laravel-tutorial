@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
+use App\Http\Requests\StorePost;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class PostsController extends Controller
 {
@@ -30,7 +31,7 @@ class PostsController extends Controller
         // }
 
         // dd(DB::getQueryLog());
-        return view('posts.index', ['posts' => BlogPost::withCount('comments')->get()]);
+        return view('posts.index', ['posts' => BlogPost::withCount('comments')->orderBy('id', 'desc')->get()]);
     }
 
     /**
@@ -52,6 +53,7 @@ class PostsController extends Controller
     public function store(StorePost $request)
     {
         $validatedData = $request->validated();
+        $validatedData['user_id'] = $request->user()->id;
         $post =  BlogPost::create($validatedData);
         $request->session()->flash('status', 'BlogPost was created');
         return redirect()->route('posts.show', ['post' => $post->id]);
@@ -90,6 +92,10 @@ class PostsController extends Controller
     public function update(StorePost $request, $id)
     {
         $post = BlogPost::findOrFail($id);
+        // if(Gate::denies('posts.update', $post)) {
+        //     abort(403, 'You cant update');
+        // }
+        $this->authorize('update', $post);
         $validatedData = $request->validated();
         $post->fill($validatedData);
         $post->save();
@@ -106,6 +112,8 @@ class PostsController extends Controller
     public function destroy($id)
     {
         $post = BlogPost::findOrFail($id);
+        
+        $this->authorize('delete', $post);
         $post->delete();
 
         session()->flash('status', 'BlogPost was deleted!');
