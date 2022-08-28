@@ -44,7 +44,7 @@ class User extends Authenticatable
         }])
         ->has('blogPosts' , '>=', 2)
         ->orderBy('blog_posts_count', 'desc');
-    }
+    } 
 
     /**
      * The attributes that should be hidden for serialization.
