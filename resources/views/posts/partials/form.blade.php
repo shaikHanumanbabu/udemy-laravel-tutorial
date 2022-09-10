@@ -6,12 +6,13 @@
     <label for="">content</label>
     <input type="text" name="content" class="form-control" value="{{ old('content', optional($post ?? null)->content) }}">
 </div>
-@if ($errors->any())
-    <div class="mb-3">
-        <ul class="list-group">
-            @foreach ($errors->all() as $error)
-                <li class="list-group-item list-group-item-danger">{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+
+<div class="form-group">
+    <label for="">Thumbnail</label>
+    <input type="file" name="thumbnail" class="form-control">
+</div>
+
+@errors
+@enderrors
+
+

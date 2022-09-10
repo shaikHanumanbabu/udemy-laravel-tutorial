@@ -6,7 +6,7 @@
 
 @section('content')
 
-<form action="{{ route('posts.store') }}" method="post">
+<form action="{{ route('posts.store') }}" method="post" enctype="multipart/form-data">
     @csrf
     @include('posts.partials.form')
     <button class="btn btn-primary btn-block mt-3" type="submit">Submit</button>

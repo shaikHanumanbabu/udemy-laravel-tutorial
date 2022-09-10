@@ -24,11 +24,14 @@ class DatabaseSeeder extends Seeder
         {
             $this->command->call('migrate:refresh');
             $this->command->info('Database refreshed');
-            $this->call([
-                UserTableSeeder::class,
-                BlogPostTableSeeder::class,
-                CommenTableSeeder::class,
-            ]);
+            return;
         }
+        $this->call([
+            UserTableSeeder::class,
+            BlogPostTableSeeder::class,
+            CommenTableSeeder::class,
+            TagsTableSeeder::class,
+            BlogPostTagSeeder::class,
+        ]);
     }
 }

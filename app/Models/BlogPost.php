@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Cache;
 
 class BlogPost extends Model
 {
@@ -21,6 +22,16 @@ class BlogPost extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class)->withTimestamps();
+    }
+
+    public function image()
+    {
+        return $this->hasOne(Image::class);
     }
 
     public function scopeLatest(Builder $builder)
@@ -39,6 +50,10 @@ class BlogPost extends Model
         parent::boot();
         static::deleting(function(BlogPost $post) {
             $post->comments()->delete();
+        });
+
+        static::updating(function(BlogPost $post) {
+            Cache::forget("blog-post-{$post->id}");
         });
 
         static::restoring(function(BlogPost $post) {

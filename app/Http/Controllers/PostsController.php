@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Image;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePost;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -32,12 +35,25 @@ class PostsController extends Controller
         // }
 
         // dd(DB::getQueryLog());
+        // $most_commented = Cache::remember('mostCommented', now()->addSeconds(10), function() {
+        //     return BlogPost::mostCommented()->take(5)->get();
+        // });
+        // $mostActive = Cache::remember('mostActive', now()->addSeconds(10), function() {
+        //     return User::withMostBlogPosts()->take(5)->get();
+        // });
+        // $lastMonthActive = Cache::remember('lastMonthActive', now()->addSeconds(10), function() {
+        //     return User::withMostBlogPostsLastMonth()->take(5)->get();
+        // });
+
+        // $posts = Cache::remember('lastMonthActive', now()->addSeconds(10), function() {
+        //     return BlogPost::latest()->withCount('comments')->with('user')->get()->paginate(10);
+        // });
+        $posts = BlogPost::latest()->withCount('comments')->with('user')->with('tags')->get();
+        // dd($posts->take(5));
         return view('posts.index', 
         [
-            'posts' => BlogPost::latest()->withCount('comments')->get(),
-            'most_commented' => BlogPost::mostCommented()->take(5)->get(),
-            'mostActive' => User::withMostBlogPosts()->take(5)->get(),
-            'lastMonthActive' => User::withMostBlogPostsLastMonth()->take(5)->get(),
+            'posts' => $posts->take(5),
+            
         ]);
     }
 
@@ -62,6 +78,17 @@ class PostsController extends Controller
         $validatedData = $request->validated();
         $validatedData['user_id'] = $request->user()->id;
         $post =  BlogPost::create($validatedData);
+
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('thumbnail');
+            $post->image()->save(
+                Image::create(['path' => $path])
+            );
+            // $name1 = $file->storeAs('thumbnail', now()->format('Y-m-d'). '.'. $file->guessExtension());
+            // $name2 = Storage::disk('public')->putFile('thumbnail', $file, now()->format('Y-m-d'). '.'. $file->guessExtension());
+            // dump(Storage::url($name1));
+            // dump(Storage::disk('public')->url($name2));
+        }
         $request->session()->flash('status', 'BlogPost was created');
         return redirect()->route('posts.show', ['post' => $post->id]);
     }
@@ -77,7 +104,53 @@ class PostsController extends Controller
         // return view('posts.show', ['post' => BlogPost::with(['comments' => function($query) {
         //     return $query->latest();
         // }])->findOrFail($id)]);
-        return view('posts.show', ['post' => BlogPost::with('comments')->findOrFail($id)]);
+        $post = Cache::remember("blog-post-{$id}", 60, function() use($id) {
+            return BlogPost::with('comments')->findOrFail($id);
+        });
+
+        $sessionId = session()->getId();
+        $counterKey = "blog-post-{$id}-counter";
+        $userKey = "blog-post-{$id}-users";
+
+        $users = Cache::get('users', []);
+
+        $usersUpdate = [];
+        $difference = 0;
+
+        $now = now();
+        foreach ($users as $session => $lastVisit) {
+            # code...
+            if($now->diffInMinutes($lastVisit) >= 1) {
+                $difference--;
+            } else {
+                $usersUpdate[$session] = $lastVisit;
+            }
+        }
+
+        if(
+            !array_key_exists($sessionId, $users)
+            || $now->diffInMinutes($users[$sessionId]) >= 1
+           ) {
+            $difference++;
+        }
+
+        $usersUpdate[$sessionId] = $now;
+
+        Cache::forever($userKey, $usersUpdate);
+
+        if (!Cache::has($counterKey)) {
+            # code...
+            Cache::forever($counterKey, 1);
+        } else {
+            Cache::increment($counterKey, $difference);
+        }
+
+        $counter = Cache::get($counterKey);
+        return view('posts.show', 
+        [
+            'post' => $post,
+            'counter' => $counter
+        ]);
     }
 
     /**

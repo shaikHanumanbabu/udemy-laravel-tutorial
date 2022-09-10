@@ -5,6 +5,8 @@
     
 
 @section('content')
+<div class="row">
+    <div class="col-8">
 <h1>{{ $post->title }} 
     @badge(['show' => now()->diffInMinutes($post->created_at) < 65])
         Brand new post
@@ -20,23 +22,38 @@
     Updated
 @endupdated
 
+@tags(['tags' => $post->tags])
+@endtags
+
+<p>Currently Reading {{ $counter }}</p>
+
 
 
 @badge(['type' => 'warning'])
     Comments
 @endbadge
+
+@include('comments._form')
 <hr>
 @forelse ($post->comments as $comment)
     <p>
         {{ $comment->content }}
     </p>
     <p class="text-muted">
-     @updated(['date' => $comment->created_at])
+     @updated(['date' => $comment->created_at, 'name' => $comment->user->name])
         
      @endupdated
     </p>
 @empty
     <p>No comments</p>
 @endforelse
+
+</div>
+
+<div class="col-4">
+    @include('posts.partials._activity')
+    
+</div>
+</div>
 
 @endsection
