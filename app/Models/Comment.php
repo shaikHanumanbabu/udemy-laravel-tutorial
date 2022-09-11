@@ -15,10 +15,16 @@ class Comment extends Model
 
     protected $fillable = ['user_id', 'content'];
 
-    public function blogPost()
+    // public function blogPost()
+    // {
+    //     // return $this->hasMany(BlogPost::class, 'post_id', 'blog_post_id');
+    //     return $this->belongsTo(BlogPost::class);
+    // }
+
+    public function commentable()
     {
-        // return $this->hasMany(BlogPost::class, 'post_id', 'blog_post_id');
-        return $this->belongsTo(BlogPost::class);
+        # code...
+        return $this->morphTo();
     }
 
     public function user()

@@ -82,7 +82,7 @@ class PostsController extends Controller
         if ($request->hasFile('thumbnail')) {
             $path = $request->file('thumbnail')->store('thumbnail');
             $post->image()->save(
-                Image::create(['path' => $path])
+                Image::make(['path' => $path])
             );
             // $name1 = $file->storeAs('thumbnail', now()->format('Y-m-d'). '.'. $file->guessExtension());
             // $name2 = Storage::disk('public')->putFile('thumbnail', $file, now()->format('Y-m-d'). '.'. $file->guessExtension());
@@ -161,6 +161,7 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
+        
         return view('posts.edit', ['post' => BlogPost::findOrFail($id)]);
         
     }
@@ -178,6 +179,26 @@ class PostsController extends Controller
         // if(Gate::denies('posts.update', $post)) {
         //     abort(403, 'You cant update');
         // }
+
+        if ($request->hasFile('thumbnail')) {
+            $path = $request->file('thumbnail')->store('thumbnail');
+            // dd($path, $post->image->path);
+            if($post->image) {
+                // Storage::disk('public')->delete('thumbnail/9OM0d4M7i2cdanvipinCT3NY0u6UMnCaMnkwdUbc.png');
+                Storage::delete($post->image->path);
+                $post->image->path = $path;
+                $post->image->save();
+            } else {
+                $post->image()->save(
+                    Image::make(['path' => $path])
+                );
+
+            }
+            // $name1 = $file->storeAs('thumbnail', now()->format('Y-m-d'). '.'. $file->guessExtension());
+            // $name2 = Storage::disk('public')->putFile('thumbnail', $file, now()->format('Y-m-d'). '.'. $file->guessExtension());
+            // dump(Storage::url($name1));
+            // dump(Storage::disk('public')->url($name2));
+        }
         $this->authorize('update', $post);
         $validatedData = $request->validated();
         $post->fill($validatedData);

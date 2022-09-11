@@ -15,10 +15,10 @@ class BlogPost extends Model
     use HasFactory;
     use SoftDeletes;
     protected $fillable = ['title', 'content', 'user_id'];
-    public function comments()
-    {
-        return $this->hasMany(Comment::class)->latest();
-    }
+    // public function comments()
+    // {
+    //     return $this->hasMany(Comment::class)->latest();
+    // }
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -31,7 +31,12 @@ class BlogPost extends Model
 
     public function image()
     {
-        return $this->hasOne(Image::class);
+        return $this->morphOne(Image::class,  'imageble');
+    }
+
+    public function comment()
+    {
+        return $this->morphMany(Comment::class , 'commentable')->latest();
     }
 
     public function scopeLatest(Builder $builder)
@@ -50,6 +55,7 @@ class BlogPost extends Model
         parent::boot();
         static::deleting(function(BlogPost $post) {
             $post->comments()->delete();
+            $post->image()->delete();
         });
 
         static::updating(function(BlogPost $post) {

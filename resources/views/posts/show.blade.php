@@ -14,6 +14,13 @@
 </h1>
 <p>{{ $post->content }}</p>
 
+@if ($post->image)
+    <img src="{{ $post->image->url() }}" alt="" height="500">
+@else
+    <h2>No Image Found!!</h2>
+@endif
+{{-- <img src="{{ url('storage/'.$post->image->path) }}" alt=""> --}}
+
 
 @updated(['date' => $post->created_at, 'name' => $post->user->name])
         

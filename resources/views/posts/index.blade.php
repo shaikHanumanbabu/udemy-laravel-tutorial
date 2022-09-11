@@ -13,7 +13,7 @@
         <div class="alert alert-danger">Deleted</div>
     @endif
 
-    @updated(['date' => $post->created_at, 'name' => $post->user->name])
+    @updated(['date' => $post->created_at, 'name' => $post->user->name, 'userId' => $post->user->id])
         
     @endupdated
 
