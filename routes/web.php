@@ -7,6 +7,8 @@ use App\Http\Controllers\PostsController;
 use App\Http\Controllers\PostTagController;
 use App\Http\Controllers\UserCommentController;
 use App\Http\Controllers\UserController;
+use App\Mail\CommentPosted;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -32,7 +34,7 @@ Route::get('/single', AboutController::class);
 Auth::routes();
 
 Route::resource('posts', PostsController::class);
-Route::resource('posts.comments', PostCommentController::class)->only(['store']);
+Route::resource('posts.comments', PostCommentController::class)->only(['index','store']);
 Route::resource('users.comments', UserCommentController::class)->only(['store']);
 Route::resource('users', UserController::class)->only(['show', 'edit', 'update']);
 Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts.tags.index');
@@ -67,6 +69,11 @@ Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts
 //           ->header('Content-Type', 'application/json')
 //           ->cookie('MY_COOKIE', 'Hanuman Shaik', 3600);
 // });
+
+Route::get('/mailable', function() {
+     $comment = Comment::find(1);
+     return new CommentPosted($comment);
+});
 
 // Route::get('/fun/download', function() use($posts) {
 //     return response()->download(public_path('/image-1.png'), 'sample-image.png');

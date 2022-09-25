@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Scopes\LatestScope;
+use App\Traits\Taggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,9 @@ class Comment extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use Taggable;
 
+    protected $hidden = ['deleted_at', 'commentable_type', 'commentable_id', 'user_id'];
     protected $fillable = ['user_id', 'content'];
 
     // public function blogPost()
@@ -31,6 +34,8 @@ class Comment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    
 
     public function scopeLatest(Builder $builder)
     {

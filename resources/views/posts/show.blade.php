@@ -40,20 +40,12 @@
     Comments
 @endbadge
 
-@include('comments._form')
+@commentForm(['route' => route('posts.comments.store', ['post' => $post->id ])])
+@endcommentForm
 <hr>
-@forelse ($post->comments as $comment)
-    <p>
-        {{ $comment->content }}
-    </p>
-    <p class="text-muted">
-     @updated(['date' => $comment->created_at, 'name' => $comment->user->name])
-        
-     @endupdated
-    </p>
-@empty
-    <p>No comments</p>
-@endforelse
+
+@commentList(['comments' => $post->comments])
+@endcommentList
 
 </div>
 

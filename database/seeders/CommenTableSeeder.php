@@ -21,7 +21,8 @@ class CommenTableSeeder extends Seeder
         $posts = BlogPost::all();
         $users  = User::all();
         Comment::factory($commentsCount)->make()->each(function($comment) use($posts, $users) {
-            $comment->blog_post_id = $posts->random()->id;
+            $comment->commentable_id = $posts->random()->id;
+            $comment->commentable_type = 'App\Models\BlogPost';
             $comment->user_id = $users->random()->id;
             $comment->save();
         });

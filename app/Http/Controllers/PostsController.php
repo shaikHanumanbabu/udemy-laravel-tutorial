@@ -101,12 +101,17 @@ class PostsController extends Controller
      */
     public function show($id)
     {
+        Storage::disk('public')->append('email.txt', "hello world". now());
+
+        // Storage::disk('public')->append('log.txt', ' World!');
+        // exit;
         // return view('posts.show', ['post' => BlogPost::with(['comments' => function($query) {
         //     return $query->latest();
         // }])->findOrFail($id)]);
-        $post = Cache::remember("blog-post-{$id}", 60, function() use($id) {
-            return BlogPost::with('comments')->findOrFail($id);
-        });
+        // $post = Cache::remember("blog-post-{$id}", 60, function() use($id) {
+        //     return BlogPost::with('comments')->findOrFail($id);
+        // });
+        $post =  BlogPost::with('comments')->findOrFail($id);
 
         $sessionId = session()->getId();
         $counterKey = "blog-post-{$id}-counter";

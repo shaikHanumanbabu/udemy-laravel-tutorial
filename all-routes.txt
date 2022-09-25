@@ -15,11 +15,12 @@
 |        | GET|HEAD  | api/user                      |                       | Closure                                                                | api                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\Authenticate:sanctum         |
 |        | GET|HEAD  | contact                       | home.contact          | App\Http\Controllers\HomeController@contact                            | web                                              |
-|        | GET|HEAD  | login                         | login                 | App\Http\Controllers\Auth\LoginController@showLoginForm                | web                                              |
-|        |           |                               |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated      |
 |        | POST      | login                         |                       | App\Http\Controllers\Auth\LoginController@login                        | web                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated      |
+|        | GET|HEAD  | login                         | login                 | App\Http\Controllers\Auth\LoginController@showLoginForm                | web                                              |
+|        |           |                               |                       |                                                                        | App\Http\Middleware\RedirectIfAuthenticated      |
 |        | POST      | logout                        | logout                | App\Http\Controllers\Auth\LoginController@logout                       | web                                              |
+|        | GET|HEAD  | mailable                      |                       | Closure                                                                | web                                              |
 |        | POST      | password/confirm              |                       | App\Http\Controllers\Auth\ConfirmPasswordController@confirm            | web                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\Authenticate                 |
 |        | GET|HEAD  | password/confirm              | password.confirm      | App\Http\Controllers\Auth\ConfirmPasswordController@showConfirmForm    | web                                              |
@@ -28,9 +29,9 @@
 |        | POST      | password/reset                | password.update       | App\Http\Controllers\Auth\ResetPasswordController@reset                | web                                              |
 |        | GET|HEAD  | password/reset                | password.request      | App\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm | web                                              |
 |        | GET|HEAD  | password/reset/{token}        | password.reset        | App\Http\Controllers\Auth\ResetPasswordController@showResetForm        | web                                              |
+|        | GET|HEAD  | posts                         | posts.index           | App\Http\Controllers\PostsController@index                             | web                                              |
 |        | POST      | posts                         | posts.store           | App\Http\Controllers\PostsController@store                             | web                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\Authenticate                 |
-|        | GET|HEAD  | posts                         | posts.index           | App\Http\Controllers\PostsController@index                             | web                                              |
 |        | GET|HEAD  | posts/create                  | posts.create          | App\Http\Controllers\PostsController@create                            | web                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\Authenticate                 |
 |        | GET|HEAD  | posts/tag/{tag}               | posts.tags.index      | App\Http\Controllers\PostTagController@index                           | web                                              |
@@ -39,6 +40,7 @@
 |        | DELETE    | posts/{post}                  | posts.destroy         | App\Http\Controllers\PostsController@destroy                           | web                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\Authenticate                 |
 |        | GET|HEAD  | posts/{post}                  | posts.show            | App\Http\Controllers\PostsController@show                              | web                                              |
+|        | GET|HEAD  | posts/{post}/comments         | posts.comments.index  | App\Http\Controllers\PostCommentController@index                       | web                                              |
 |        | POST      | posts/{post}/comments         | posts.comments.store  | App\Http\Controllers\PostCommentController@store                       | web                                              |
 |        |           |                               |                       |                                                                        | App\Http\Middleware\Authenticate                 |
 |        | GET|HEAD  | posts/{post}/edit             | posts.edit            | App\Http\Controllers\PostsController@edit                              | web                                              |

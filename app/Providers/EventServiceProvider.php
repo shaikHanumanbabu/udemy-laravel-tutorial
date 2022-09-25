@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Queue\Events\QueueBusy;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
-
+use App\Notifications\QueueHasLongWaitTime;
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -28,5 +30,14 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+
+        Event::listen(function (QueueBusy $event) {
+            Notification::route('mail', 'dev@example.com')
+                    ->notify(new QueueHasLongWaitTime(
+                        $event->connection,
+                        $event->queue,
+                        $event->size
+                    ));
+        });
     }
 }
